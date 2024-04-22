@@ -68,16 +68,20 @@ void TcpClient::onReadyRead()
         return;
     }
     QJsonObject response = doc.object();
-    QString status = response["status"].toString();
 
-    if (status == "error") {
-        QString errorMessage = response["message"].toString();
-        Logger::instance().warning("Ошибка от сервера: " + errorMessage);
+    QString status = response["status"].toString();
+    QString message = response["message"].toString();
+
+    if (status == "data_not_actual") {
+        Logger::instance().warning("Ошибка от сервера: " + message);
     }
-    else if (status == "success") {
-        QByteArray timeData = QByteArray::fromBase64(response["timeData"].toString().toUtf8());
+    else if (status == "data_actual") {
+        QByteArray timeData = QByteArray::fromBase64(message.toUtf8());
         timeSynchronizer->timeFromBinary(timeData);
         emit timeUpdated();
+    }
+    else if (status == "data_unknown") {
+        Logger::instance().warning("Ошибка от сервера: " + message);
     }
 }
 

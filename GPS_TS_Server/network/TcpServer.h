@@ -7,6 +7,14 @@
 class TCPServer : public QTcpServer
 {
 	Q_OBJECT
+
+	enum class ServerDataState
+	{
+		ACTUAL,
+		NOT_ACTUAL,
+		UNKNOWN
+	};
+
 public:
 	explicit TCPServer(TimeSynchronizer* timeSynchronizer, QObject* parent = nullptr);
 	~TCPServer() final;
@@ -15,8 +23,8 @@ protected:
 	void incomingConnection(qintptr socketDescriptor) override;
 
 public slots:
-	void setDataActual();
-	void setDataNotActual();
+	void setDataActualState() { dataState = ServerDataState::ACTUAL; };
+	void setDataNotActualState() { dataState = ServerDataState::NOT_ACTUAL; };
 
 private slots:
 	void onReadyRead();
@@ -26,5 +34,5 @@ private slots:
 private:
 	QList<QTcpSocket*> clients;
 	TimeSynchronizer* timeSynchronizer{ nullptr };
-	bool isActual{ true }; //Флаг того, можно ли считать данные на сервере актуальными
+	ServerDataState dataState{ ServerDataState::UNKNOWN };
 };

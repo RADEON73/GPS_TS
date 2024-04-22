@@ -40,10 +40,9 @@ QStringList SerialPort::availablePorts()
 
 void SerialPort::handleReadyRead()
 {
-    if (!dataTimeoutTimer.isActive()) {
-        emit dataRestored();
+    emit dataRestored();
+    if (!dataTimeoutTimer.isActive())
         syncTimer.start();
-    }
     dataTimeoutTimer.start();
 
     for (auto i : m_serialPort.readAll()) {

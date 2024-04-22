@@ -51,13 +51,21 @@ void TCPServer::onReadyRead()
 
 		// Создаем JSON объект для ответа
 		QJsonObject response;
-		if (isActual) {
-			response["status"] = "success";
-			response["timeData"] = QString(timeSynchronizer->timeToBinary().toBase64());
-		}
-		else {
-			response["status"] = "error";
+		switch (dataState) {
+		case ServerDataState::UNKNOWN:
+			response["status"] = "data_unknown";
+			response["message"] = "Данные не достоверны.";
+			break;
+		case ServerDataState::NOT_ACTUAL:
+			response["status"] = "data_not_actual";
 			response["message"] = "Время на сервере не синхронизировано.";
+			break;
+		case ServerDataState::ACTUAL:
+			response["status"] = "data_actual";
+			response["message"] = QString(timeSynchronizer->timeToBinary().toBase64());
+			break;
+		default:
+			break;
 		}
 		QJsonDocument doc(response);
 		client->write(doc.toJson());
@@ -74,14 +82,4 @@ void TCPServer::onDisconnected()
 	clients.removeOne(client);
 	client->deleteLater();
 	Logger::instance().info("TCP клиент отключен.");
-}
-
-void TCPServer::setDataActual()
-{
-	isActual = true;
-}
-
-void TCPServer::setDataNotActual()
-{
-	isActual = false;
 }

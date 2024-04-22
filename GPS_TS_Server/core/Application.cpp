@@ -15,8 +15,8 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
         Logger::instance().error("Не удалось запустить приложение!");
     Logger::instance().info(QString("Приложение запущено на порту %1").arg(tcpPort));
 
-    connect(&serial_port, &SerialPort::dataTimeout, &server, &TCPServer::setDataNotActual);
-    connect(&serial_port, &SerialPort::dataRestored, &server, &TCPServer::setDataActual);
+    connect(&serial_port, &SerialPort::dataTimeout, &server, &TCPServer::setDataNotActualState);
+    connect(&serial_port, &SerialPort::dataRestored, &server, &TCPServer::setDataActualState);
 }
 
 Application::~Application()

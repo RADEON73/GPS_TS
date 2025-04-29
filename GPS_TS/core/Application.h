@@ -1,6 +1,7 @@
 #pragma once
 #include <QtCore/QCoreApplication>
 #include "../network/SerialPort.h"
+#include "Settings.h"
 
 class Application : public QCoreApplication
 {

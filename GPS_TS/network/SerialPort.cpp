@@ -9,7 +9,7 @@ SerialPort::SerialPort(QObject* parent) : QObject(parent)
 {
     m_serialPort = new QSerialPort(this);
 
-    // Подключаем сигналы
+    // РџРѕРґРєР»СЋС‡Р°РµРј СЃРёРіРЅР°Р»С‹
     connect(m_serialPort, &QSerialPort::readyRead, this, &SerialPort::handleReadyRead);
     connect(m_serialPort, &QSerialPort::errorOccurred, this, &SerialPort::handleError);
 }
@@ -60,9 +60,10 @@ void SerialPort::handleError(QSerialPort::SerialPortError error)
         qWarning() << "Serial port ResourceError - connection closed:" << m_serialPort->errorString();
         break;
     case QSerialPort::NoError:
+        qInfo() << "Port" << m_serialPort->portName() << "opened successfully";
         break;
     default:
-        qWarning() << "Serial port error:" << m_serialPort->errorString();
+        qWarning() << "Failed to open port"  << m_serialPort->portName() << ":" << m_serialPort->errorString();
         break;
     }
 
@@ -80,19 +81,14 @@ bool SerialPort::openPort(const QString& portName, qint32 baudRate)
     m_serialPort->setStopBits(QSerialPort::OneStop);
     m_serialPort->setFlowControl(QSerialPort::NoFlowControl);
 
-    if (!m_serialPort->open(QIODevice::ReadWrite)) {
-        qWarning() << "Failed to open port" << portName << ":" << m_serialPort->errorString();
+    if (!m_serialPort->open(QIODevice::ReadWrite))
         return false;
-    }
 
-    qInfo() << "Port" << portName << "opened successfully";
     return true;
 }
 
 void SerialPort::closePort()
 {
-    if (m_serialPort->isOpen()) {
+    if (m_serialPort->isOpen())
         m_serialPort->close();
-        qInfo() << "Port closed";
-    }
 }

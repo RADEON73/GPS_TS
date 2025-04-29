@@ -16,11 +16,21 @@ find_package(Qt${QT_VERSION_MAJOR}
 
 qt_standard_project_setup()
 
+if(WIN32)
+    # Добавляем манифест для поддержки UTF-8 в Windows
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+    add_definitions(-DUNICODE -D_UNICODE)
+    
+    # Для новых версий Windows (10+)
+    add_compile_definitions("_WIN32_WINNT=0x0A00")
+    add_compile_definitions("WINVER=0x0A00")
+endif()
+
 qt_add_executable(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PUBLIC
     main.cpp
-    core/ConfigManager.cpp core/ConfigManager.h
+    core/Settings.cpp core/Settings.h
 	core/Application.cpp core/Application.h
     network/TcpServer.cpp network/TcpServer.h
     network/SerialPort.cpp network/SerialPort.h
@@ -33,6 +43,7 @@ target_sources(${PROJECT_NAME} PUBLIC
 	parser/NmeaVTG.cpp parser/NmeaVTG.h
 	parser/NmeaIParser.h
 	parser/NmeaParserFactory.h
+	encoding_fix.h
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -45,7 +56,7 @@ target_link_libraries(${PROJECT_NAME}
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" 
     PREFIX "Header Files" 
     FILES 
-        ${CMAKE_CURRENT_SOURCE_DIR}/core/ConfigManager.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/Settings.h
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Application.h
         ${CMAKE_CURRENT_SOURCE_DIR}/network/TcpServer.h
         ${CMAKE_CURRENT_SOURCE_DIR}/network/SerialPort.h
@@ -64,7 +75,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
     PREFIX "Source Files" 
     FILES 
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/core/ConfigManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/core/Settings.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Application.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/network/TcpServer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/network/SerialPort.cpp

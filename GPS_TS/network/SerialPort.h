@@ -1,4 +1,4 @@
-// Класс для работы с последовательным портом
+// В Р»Р°СЃСЃ РґР»В¤ СЂР°Р±РѕС‚С‹ СЃ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Рј РїРѕСЂС‚РѕРј
 #pragma once
 #include <QtCore/qobject.h>
 #include <QtSerialPort/qserialport.h>

@@ -1,6 +1,6 @@
 #pragma once
 #include <QtCore/QCoreApplication>
-#include "../network/SerialPort.h"
+#include "../network/TCPClient.h"
 #include "Settings.h"
 
 class Application : public QCoreApplication
@@ -12,5 +12,5 @@ public:
     ~Application() final;
 
 private:
-    SerialPort serial_port;
+    TcpClient client;
 };

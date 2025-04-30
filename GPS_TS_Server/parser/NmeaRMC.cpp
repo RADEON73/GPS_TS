@@ -4,25 +4,30 @@
 #elif defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
 #include <sys/time.h>
 #endif
+#include "../core/Settings.h"
+#include "../core/Logger.h"
 
-void nmeaRMC::parse(const QStringList & vStr)
+void nmeaRMC::parse(const QStringList & str)
 {
-	if (vStr.size() != 13) 
+	if (str.size() != 13) 
 		return;
-	data->Message_ID = vStr[0];
-	data->UTC_Time = vStr[1];
-	data->Status = vStr[2];
-	data->Latitude = vStr[3];
-	data->NS_Indicator = vStr[4];
-	data->Longitude = vStr[5];
-	data->EW_Indicator = vStr[6];
-	data->Speed_over_ground = vStr[7];
-	data->Course_over_ground = vStr[8];
-	data->Date = vStr[9];
-	data->Magnetic_variation = vStr[10];
-	data->Variation_sense = vStr[11];
-	data->Mode = vStr[12].left(1);
-	data->Checksum = vStr[12].right(2);
+	data->Message_ID = str[0];
+	data->UTC_Time = str[1];
+	data->Status = str[2];
+	data->Latitude = str[3];
+	data->NS_Indicator = str[4];
+	data->Longitude = str[5];
+	data->EW_Indicator = str[6];
+	data->Speed_over_ground = str[7];
+	data->Course_over_ground = str[8];
+	data->Date = str[9];
+	data->Magnetic_variation = str[10];
+	data->Variation_sense = str[11];
+	data->Mode = str[12].left(1);
+	data->Checksum = str[12].right(2);
+
+	if (Settings::instance().logging().logRMC)
+		Logger::instance().info(str.join(","));
 }
 
 bool setSystemTimeNative(const QDateTime& dt)

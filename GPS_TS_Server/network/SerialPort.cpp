@@ -37,8 +37,6 @@ void SerialPort::handleReadyRead()
             m_localBuf.remove('\n');
             m_localBuf.remove('\r');
             if (m_localBuf[0] == '$') {
-                //m_gpsTimer->start();
-                std::cout << m_localBuf.toStdString() << std::endl;
                 if (auto nmeaParser = NmeaParserFactory::createParser(m_localBuf)) {
                     nmeaParser->parse(m_localBuf.split(','));
                     nmeaParser->process();

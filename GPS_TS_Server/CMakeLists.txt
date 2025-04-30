@@ -26,12 +26,13 @@ if(WIN32)
     add_compile_definitions("WINVER=0x0A00")
 endif()
 
-qt_add_executable(${PROJECT_NAME})
+qt_add_executable(${PROJECT_NAME}_Server)
 
-target_sources(${PROJECT_NAME} PUBLIC
+target_sources(${PROJECT_NAME}_Server PUBLIC
     main.cpp
     core/Settings.cpp core/Settings.h
 	core/Application.cpp core/Application.h
+	core/Logger.cpp core/Logger.h
     network/TcpServer.cpp network/TcpServer.h
     network/SerialPort.cpp network/SerialPort.h
 	parser/NmeaGGA.cpp parser/NmeaGGA.h
@@ -46,7 +47,7 @@ target_sources(${PROJECT_NAME} PUBLIC
 	encoding_fix.h
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}_Server
     PUBLIC
         Qt::Core
 		Qt::Network
@@ -58,6 +59,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
     FILES 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/Settings.h
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Application.h
+		${CMAKE_CURRENT_SOURCE_DIR}/core/Logger.h
         ${CMAKE_CURRENT_SOURCE_DIR}/network/TcpServer.h
         ${CMAKE_CURRENT_SOURCE_DIR}/network/SerialPort.h
 		${CMAKE_CURRENT_SOURCE_DIR}/parser/NmeaGGA.h
@@ -77,6 +79,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/core/Settings.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Application.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/core/Logger.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/network/TcpServer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/network/SerialPort.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/parser/NmeaGGA.cpp
@@ -89,7 +92,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 # Установка стандарта C++
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(${PROJECT_NAME}_Server PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )

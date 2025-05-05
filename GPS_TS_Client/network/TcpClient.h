@@ -7,13 +7,13 @@ class TcpClient : public QObject
 {
     Q_OBJECT
 public:
-    explicit TcpClient(TimeSynchronizer* timeSynchronizer, QObject* parent = nullptr);
+    explicit TcpClient(TimeSynchronizer* timeSynchronizer_, QObject* parent = nullptr);
     ~TcpClient() final;
 
     void connectToServer(const QString& host, quint16 port);
 
 signals:
-    void timeUpdated(const QDateTime& newTime);
+    void timeUpdated();
 
 private slots:
     void onConnected();
@@ -23,6 +23,6 @@ private slots:
 
 private:
     QTcpSocket socket{ this };
-    QTimer timer{ this };
+    QTimer syncTimer{ this };
     TimeSynchronizer* timeSynchronizer{ nullptr };
 };

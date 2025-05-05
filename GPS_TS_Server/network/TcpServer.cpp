@@ -10,6 +10,7 @@ TCPServer::TCPServer(TimeSynchronizer* timeSynchronizer, QObject* parent) :
 	timeSynchronizer(timeSynchronizer)
 {
 	Logger::instance().debug("Сервер конструируется.");
+	connect(&syncTimer, &QTimer::timeout, timeSynchronizer, &TimeSynchronizer::synchronizeTime);
 }
 
 TCPServer::~TCPServer()

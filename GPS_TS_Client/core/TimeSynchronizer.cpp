@@ -7,8 +7,6 @@
 
 TimeSynchronizer::TimeSynchronizer(QObject* parent) : QObject(parent)
 {
-    // Соединяем сигнал таймера с нашим слотом синхронизации
-    connect(&m_syncTimer, &QTimer::timeout, this, &TimeSynchronizer::synchronizeTime);
 }
 
 QByteArray TimeSynchronizer::currentTimeToBinary() const
@@ -25,37 +23,6 @@ void TimeSynchronizer::setTimeFromBinary(const QByteArray& timeData)
 	qint64 msecs;
 	stream >> msecs;
 	m_timeVariable = QDateTime::fromMSecsSinceEpoch(msecs, Qt::UTC);
-}
-
-void TimeSynchronizer::setSyncInterval(int seconds)
-{
-    m_interval = seconds * 1000; // Конвертируем в миллисекунды
-    if (m_syncTimer.isActive()) {
-        m_syncTimer.start(m_interval);
-    }
-}
-
-void TimeSynchronizer::startSync()
-{
-    if (!m_syncTimer.isActive()) {
-        m_syncTimer.start(m_interval);
-        emit syncStarted();
-		Logger::instance().debug("Запускаем таймер синхронизации времени!");
-    }
-}
-
-void TimeSynchronizer::stopSync()
-{
-    if (m_syncTimer.isActive()) {
-        m_syncTimer.stop();
-        emit syncStopped();
-		Logger::instance().debug("Останавливаем таймер синхронизации времени!");
-    }
-}
-
-bool TimeSynchronizer::isActive() const
-{
-    return m_syncTimer.isActive();
 }
 
 void TimeSynchronizer::synchronizeTime()

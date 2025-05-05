@@ -5,16 +5,17 @@
 
 constexpr auto SYNC_TIME_TAG = "SYNC_CURRENT_TIME_RESPONSE";
 
-TcpClient::TcpClient(TimeSynchronizer* timeSynchronizer, QObject* parent) :
+TcpClient::TcpClient(TimeSynchronizer* timeSynchronizer_, QObject* parent) :
     QObject(parent),
-	timeSynchronizer(timeSynchronizer)
+	timeSynchronizer(timeSynchronizer_)
 {
     Logger::instance().debug("Клиент конструируется!");
 
     connect(&socket, &QTcpSocket::connected, this, &TcpClient::onConnected);
     connect(&socket, &QTcpSocket::readyRead, this, &TcpClient::onReadyRead);
     connect(&socket, &QTcpSocket::disconnected, this, &TcpClient::onDisconnected);
-    connect(&timer, &QTimer::timeout, this, &TcpClient::requestData);
+    connect(&syncTimer, &QTimer::timeout, this, &TcpClient::requestData);
+    connect(this, &TcpClient::timeUpdated, timeSynchronizer, &TimeSynchronizer::synchronizeTime);
 }
 
 TcpClient::~TcpClient()
@@ -38,11 +39,10 @@ void TcpClient::onConnected()
 {
     Logger::instance().info("Подключено к серверу!");
     auto tInterval = Settings::instance().app().timeSyncInterval * 1000;
-    timer.start(tInterval);
-    requestData();
     Logger::instance().debug("Клиент запросил у сервера синхронизацию времени.");
     if (Settings::instance().app().timeSyncOn) {
-        timeSynchronizer->startSync();
+        syncTimer.start(tInterval);
+        //requestData();
         Logger::instance().debug("Клиент запустил таймер синхронизации времени.");
     }
 
@@ -53,14 +53,13 @@ void TcpClient::onReadyRead()
     Logger::instance().debug("Клиент обрабатывает данные от сервера.");
     QByteArray timeData = socket.readAll();
     timeSynchronizer->setTimeFromBinary(timeData);
-    emit timeUpdated(timeSynchronizer->currentTime());
+    emit timeUpdated();
 }
 
 void TcpClient::onDisconnected()
 {
     Logger::instance().info("Отключено от сервера!");
-    timer.stop();
-    timeSynchronizer->stopSync();
+    syncTimer.stop();
 }
 
 void TcpClient::requestData()

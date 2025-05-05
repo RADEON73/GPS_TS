@@ -15,15 +15,13 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
         Logger::instance().error("Не удалось запустить приложение!");
     Logger::instance().info(QString("Приложение запущено на порту %1").arg(tcpPort));
 
-    synchronizer.setSyncInterval(Settings::instance().app().timeSyncInterval);
-    if (Settings::instance().app().timeSyncOn)
-        synchronizer.startSync();
+    //if (Settings::instance().app().timeSyncOn)
+    //    synchronizer.startSync();
 
 	connect(&serial_port, &SerialPort::setTime, &synchronizer, &TimeSynchronizer::setTime);
 }
 
 Application::~Application()
 {
-    synchronizer.stopSync();
     serial_port.closePort(); 
 }

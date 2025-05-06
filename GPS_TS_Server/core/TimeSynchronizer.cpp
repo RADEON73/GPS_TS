@@ -9,7 +9,7 @@ TimeSynchronizer::TimeSynchronizer(QObject* parent) : QObject(parent)
 {
 }
 
-QByteArray TimeSynchronizer::currentTimeToBinary() const
+QByteArray TimeSynchronizer::timeToBinary() const
 {
 	QByteArray data;
 	QDataStream stream(&data, QIODevice::WriteOnly);
@@ -17,7 +17,7 @@ QByteArray TimeSynchronizer::currentTimeToBinary() const
 	return data;
 }
 
-void TimeSynchronizer::setTimeFromBinary(const QByteArray& timeData)
+void TimeSynchronizer::timeFromBinary(const QByteArray& timeData)
 {
 	QDataStream stream(timeData);
 	qint64 msecs;

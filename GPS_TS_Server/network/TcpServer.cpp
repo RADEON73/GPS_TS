@@ -10,7 +10,6 @@ TCPServer::TCPServer(TimeSynchronizer* timeSynchronizer, QObject* parent) :
 	timeSynchronizer(timeSynchronizer)
 {
 	Logger::instance().debug("Сервер конструируется.");
-	connect(&syncTimer, &QTimer::timeout, timeSynchronizer, &TimeSynchronizer::synchronizeTime);
 }
 
 TCPServer::~TCPServer()
@@ -48,7 +47,7 @@ void TCPServer::onReadyRead()
 	QByteArray request = client->readAll();
 	if (request == SYNC_TIME_TAG) {
 		Logger::instance().debug("Получили запрос на синхронизацию времени");
-		QByteArray timeData = timeSynchronizer->currentTimeToBinary();
+		QByteArray timeData = timeSynchronizer->timeToBinary();
 		client->write(timeData);
 		Logger::instance().debug("Клиенту отправлено актуальное время");
 	}

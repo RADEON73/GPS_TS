@@ -14,8 +14,8 @@ public:
     explicit TimeSynchronizer(QObject* parent = nullptr);
 
     // Новые методы для бинарной сериализации
-    QByteArray currentTimeToBinary() const;
-    void setTimeFromBinary(const QByteArray& timeData);
+    QByteArray timeToBinary() const;
+    void timeFromBinary(const QByteArray& timeData);
 
     QDateTime currentTime() const { return m_timeVariable; }
 

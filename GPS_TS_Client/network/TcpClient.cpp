@@ -42,7 +42,7 @@ void TcpClient::onConnected()
     Logger::instance().debug("Клиент запросил у сервера синхронизацию времени.");
     if (Settings::instance().app().timeSyncOn) {
         syncTimer.start(tInterval);
-        //requestData();
+        requestData();
         Logger::instance().debug("Клиент запустил таймер синхронизации времени.");
     }
 
@@ -52,7 +52,7 @@ void TcpClient::onReadyRead()
 {
     Logger::instance().debug("Клиент обрабатывает данные от сервера.");
     QByteArray timeData = socket.readAll();
-    timeSynchronizer->setTimeFromBinary(timeData);
+    timeSynchronizer->timeFromBinary(timeData);
     emit timeUpdated();
 }
 

@@ -15,10 +15,20 @@ find_package(Qt${QT_VERSION_MAJOR}
 
 qt_standard_project_setup()
 
+if(MSVC)
+    # Для статической линковки CRT
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	# Для статической CRT
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+endif()
+
 if(WIN32)
     # Добавляем манифест для поддержки UTF-8 в Windows
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
     add_definitions(-DUNICODE -D_UNICODE)
+	
+	set(QT_LINK_STATIC ON)
     
     # Для новых версий Windows (10+)
     add_compile_definitions("_WIN32_WINNT=0x0A00")
@@ -39,8 +49,8 @@ target_sources(${PROJECT_NAME}_Client PUBLIC
 
 target_link_libraries(${PROJECT_NAME}_Client
     PUBLIC
-        Qt::Core
-		Qt::Network
+        Qt${QT_VERSION_MAJOR}::Core
+		Qt${QT_VERSION_MAJOR}::Network
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" 

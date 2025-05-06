@@ -4,13 +4,15 @@
 #include <QtSerialPort/qserialport.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qobjectdefs.h>
+#include <QTimer>
+#include "../core/TimeSynchronizer.h"
 
 class SerialPort : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit SerialPort(QObject* parent = nullptr);
+    explicit SerialPort(TimeSynchronizer* timeSynchronizer_, QObject* parent = nullptr);
 
     ~SerialPort() final;
 
@@ -31,4 +33,6 @@ private slots:
 private:
     QSerialPort* m_serialPort;
     QString m_localBuf{ "0" };
+    TimeSynchronizer* timeSynchronizer{ nullptr };
+    QTimer syncTimer{ this };
 };

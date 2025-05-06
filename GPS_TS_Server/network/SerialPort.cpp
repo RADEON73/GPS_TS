@@ -5,14 +5,20 @@
 #include <iostream>
 #include "../parser/NmeaParserFactory.h"
 #include <variant>
+#include "../core/Settings.h"
 
-SerialPort::SerialPort(QObject* parent) : QObject(parent)
+SerialPort::SerialPort(TimeSynchronizer* timeSynchronizer_, QObject* parent) :
+    QObject(parent),
+    timeSynchronizer(timeSynchronizer_)
 {
     m_serialPort = new QSerialPort(this);
 
     // Подключаем сигналы
     connect(m_serialPort, &QSerialPort::readyRead, this, &SerialPort::handleReadyRead);
     connect(m_serialPort, &QSerialPort::errorOccurred, this, &SerialPort::handleError);
+
+    connect(this, &SerialPort::setTime, timeSynchronizer, &TimeSynchronizer::setTime);
+    connect(&syncTimer, &QTimer::timeout, timeSynchronizer, &TimeSynchronizer::synchronizeTime);
 }
 
 SerialPort::~SerialPort()
@@ -86,11 +92,15 @@ bool SerialPort::openPort(const QString& portName, qint32 baudRate)
     if (!m_serialPort->open(QIODevice::ReadWrite))
         return false;
 
+    auto tInterval = Settings::instance().app().timeSyncInterval * 1000;
+    syncTimer.start(tInterval);
+
     return true;
 }
 
 void SerialPort::closePort()
 {
+    syncTimer.stop();
     if (m_serialPort->isOpen())
         m_serialPort->close();
 }

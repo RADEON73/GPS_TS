@@ -15,7 +15,7 @@ public:
     ~Application() final;
 
 private:
-    SerialPort serial_port;
     TimeSynchronizer synchronizer;
+    SerialPort serial_port{ &synchronizer };
     TCPServer server{ &synchronizer };
 };

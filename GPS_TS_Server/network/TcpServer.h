@@ -21,5 +21,4 @@ private slots:
 private:
 	QList<QTcpSocket*> clients;
 	TimeSynchronizer* timeSynchronizer{ nullptr };
-	QTimer syncTimer{ this };
 };

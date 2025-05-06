@@ -14,11 +14,6 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
     if (!server.listen(QHostAddress::Any, tcpPort))
         Logger::instance().error("Не удалось запустить приложение!");
     Logger::instance().info(QString("Приложение запущено на порту %1").arg(tcpPort));
-
-    //if (Settings::instance().app().timeSyncOn)
-    //    synchronizer.startSync();
-
-	connect(&serial_port, &SerialPort::setTime, &synchronizer, &TimeSynchronizer::setTime);
 }
 
 Application::~Application()

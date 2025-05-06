@@ -7,6 +7,7 @@
 #include <variant>
 #include "../core/Settings.h"
 #include "../core/Logger.h"
+#include <QRegularExpression>
 
 constexpr int DATA_LOST_INTERVAL_MS = 5000;
 
@@ -95,12 +96,8 @@ bool SerialPort::openPort(const QString& portName, qint32 baudRate)
     if (m_serialPort.isOpen())
         closePort();
 
-    m_serialPort.setPortName(portName);
-    m_serialPort.setBaudRate(baudRate);
-    m_serialPort.setDataBits(QSerialPort::Data8);
-    m_serialPort.setParity(QSerialPort::NoParity);
-    m_serialPort.setStopBits(QSerialPort::OneStop);
-    m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
+    if (!init(portName, baudRate))
+        return false;
 
     if (!m_serialPort.open(QIODevice::ReadWrite)) {
         QString errorString = m_serialPort.errorString();
@@ -135,4 +132,94 @@ void SerialPort::checkDataTimeout()
     Logger::instance().warning(m_serialPort.portName() + ": Прекращение поступления данных, ожидаем восстановление соединения...");
     syncTimer.stop();
     emit dataTimeout();
+}
+
+bool SerialPort::init(const QString& portName, qint32 baudRate)
+{
+    // Проверка имени порта
+    if (QRegularExpression comPortRegex("^COM\\d+$", QRegularExpression::CaseInsensitiveOption);
+        !comPortRegex.match(portName).hasMatch()
+        ) {
+        QString error = QString("Некорректное имя порта: %1. Ожидается формат COMn").arg(portName);
+        emit portError(error);
+        Logger::instance().warning(error);
+        return false;
+    }
+    m_serialPort.setPortName(portName);
+
+    // Проверка стандартных значений BaudRate
+    if (const QVector standardBaudRates = { 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 };
+        !standardBaudRates.contains(baudRate)
+        ) {
+        QString warning = QString("Нестандартное значение BaudRate: %1. Возможны проблемы с работой порта").arg(baudRate);
+        Logger::instance().warning(warning);
+    }
+    m_serialPort.setBaudRate(baudRate);
+
+    // Получаем настройки из класса Settings
+    const auto& settings = Settings::instance().serial();
+
+    // Устанавливаем DataBits
+    switch (settings.dataBits) {
+    case 5: m_serialPort.setDataBits(QSerialPort::Data5); break;
+    case 6: m_serialPort.setDataBits(QSerialPort::Data6); break;
+    case 7: m_serialPort.setDataBits(QSerialPort::Data7); break;
+    case 8: m_serialPort.setDataBits(QSerialPort::Data8); break;
+    default:
+        m_serialPort.setDataBits(QSerialPort::Data8);
+        Logger::instance().warning("Некорректное значение DataBits, используется значение по умолчанию (8)");
+        break;
+    }
+
+    // Устанавливаем Parity
+    if (settings.parity == "None") {
+        m_serialPort.setParity(QSerialPort::NoParity);
+    }
+    else if (settings.parity == "Even") {
+        m_serialPort.setParity(QSerialPort::EvenParity);
+    }
+    else if (settings.parity == "Odd") {
+        m_serialPort.setParity(QSerialPort::OddParity);
+    }
+    else if (settings.parity == "Space") {
+        m_serialPort.setParity(QSerialPort::SpaceParity);
+    }
+    else if (settings.parity == "Mark") {
+        m_serialPort.setParity(QSerialPort::MarkParity);
+    }
+    else {
+        m_serialPort.setParity(QSerialPort::NoParity);
+        Logger::instance().warning("Некорректное значение Parity, используется значение по умолчанию (None)");
+    }
+
+    // Устанавливаем StopBits
+    if (settings.stopBits == 1) {
+        m_serialPort.setStopBits(QSerialPort::OneStop);
+    }
+    else if (settings.stopBits == 2) {
+        m_serialPort.setStopBits(QSerialPort::TwoStop);
+    }
+    else if (settings.stopBits == 3) {
+        m_serialPort.setStopBits(QSerialPort::OneAndHalfStop);
+    }
+    else {
+        m_serialPort.setStopBits(QSerialPort::OneStop);
+        Logger::instance().warning("Некорректное значение StopBits, используется значение по умолчанию (1)");
+    }
+
+    // Устанавливаем FlowControl
+    if (settings.flowControl == "None") {
+        m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
+    }
+    else if (settings.flowControl == "Hardware") {
+        m_serialPort.setFlowControl(QSerialPort::HardwareControl);
+    }
+    else if (settings.flowControl == "Software") {
+        m_serialPort.setFlowControl(QSerialPort::SoftwareControl);
+    }
+    else {
+        m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
+        Logger::instance().warning("Некорректное значение FlowControl, используется значение по умолчанию (None)");
+    }
+    return true;
 }

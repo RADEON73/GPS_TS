@@ -17,6 +17,7 @@ public:
     ~SerialPort() final;
 
     bool openPort(const QString& portName, qint32 baudRate = QSerialPort::Baud9600);
+
     void closePort();
     static QStringList availablePorts();
 
@@ -32,6 +33,8 @@ private slots:
     void checkDataTimeout();
 
 private:
+    bool init(const QString& portName, qint32 baudRate);
+
     QSerialPort m_serialPort;
     QString m_localBuf{ "0" };
     TimeSynchronizer* timeSynchronizer{ nullptr };

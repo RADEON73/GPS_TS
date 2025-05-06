@@ -36,8 +36,7 @@ void TCPServer::incomingConnection(qintptr socketDescriptor)
 	connect(client, &QTcpSocket::readyRead, this, &TCPServer::onReadyRead);
 	connect(client, &QTcpSocket::disconnected, this, &TCPServer::onDisconnected);
 
-	Logger::instance().info("TCP клиент подключен.");
-	//Logger::instance().info(QString("Новый клиент подключен:").arg(client->peerAddress().toString()));
+	Logger::instance().info("TCP клиент подключен." + QString(client->peerAddress().toString()));
 }
 
 void TCPServer::onReadyRead()

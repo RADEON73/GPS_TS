@@ -6,17 +6,20 @@
 #include "../parser/NmeaParserFactory.h"
 #include <variant>
 #include "../core/Settings.h"
+#include "../core/Logger.h"
+
+constexpr int DATA_LOST_INTERVAL_MS = 5000;
 
 SerialPort::SerialPort(TimeSynchronizer* timeSynchronizer_, QObject* parent) :
     QObject(parent),
     timeSynchronizer(timeSynchronizer_)
 {
-    m_serialPort = new QSerialPort(this);
+    dataTimeoutTimer.setInterval(DATA_LOST_INTERVAL_MS);
+    dataTimeoutTimer.setSingleShot(true);
+    connect(&dataTimeoutTimer, &QTimer::timeout, this, &SerialPort::checkDataTimeout);
 
-    // Подключаем сигналы
-    connect(m_serialPort, &QSerialPort::readyRead, this, &SerialPort::handleReadyRead);
-    connect(m_serialPort, &QSerialPort::errorOccurred, this, &SerialPort::handleError);
-
+    connect(&m_serialPort, &QSerialPort::readyRead, this, &SerialPort::handleReadyRead);
+    connect(&m_serialPort, &QSerialPort::errorOccurred, this, &SerialPort::handleError);
     connect(this, &SerialPort::setTime, timeSynchronizer, &TimeSynchronizer::setTime);
     connect(&syncTimer, &QTimer::timeout, timeSynchronizer, &TimeSynchronizer::synchronizeTime);
 }
@@ -36,10 +39,13 @@ QStringList SerialPort::availablePorts()
 
 void SerialPort::handleReadyRead()
 {
-    QByteArray gpsPacket = m_serialPort->readAll();
-    emit dataReceived(gpsPacket);
+    if (!dataTimeoutTimer.isActive()) {
+        emit dataRestored();
+        syncTimer.start();
+    }
+    dataTimeoutTimer.start();
 
-    for (auto i : gpsPacket) {
+    for (auto i : m_serialPort.readAll()) {
         if (i == '$') {
             m_localBuf.remove('\n');
             m_localBuf.remove('\r');
@@ -60,47 +66,73 @@ void SerialPort::handleReadyRead()
 
 void SerialPort::handleError(QSerialPort::SerialPortError error)
 {
-    emit portError(m_serialPort->errorString());
+    if (error == QSerialPort::NoError)
+        return;
+
+    QString errorString = m_serialPort.errorString();
+    emit portError(errorString);
+
     switch (error) {
     case QSerialPort::ResourceError:
-        if (m_serialPort->isOpen())
-            m_serialPort->close();
-        qWarning() << "Serial port ResourceError - connection closed:" << m_serialPort->errorString();
+        Logger::instance().warning("Ошибка ресурсов - соединение закрыто:" + errorString);
         break;
-    case QSerialPort::NoError:
-        qInfo() << "Port" << m_serialPort->portName() << "opened successfully";
+    case QSerialPort::PermissionError:
+        Logger::instance().warning("Ошибка прав доступа - соединение закрыто:" + errorString);
+        break;
+    case QSerialPort::DeviceNotFoundError:
+        Logger::instance().warning("Устройство не найдено - соединение закрыто:" + errorString);
         break;
     default:
-        qWarning() << "Failed to open port"  << m_serialPort->portName() << ":" << m_serialPort->errorString();
+        Logger::instance().warning("Ошибка серийного порта" + m_serialPort.portName() + ":" + errorString);
         break;
     }
-
+    if (m_serialPort.isOpen())
+        closePort();
 }
 
 bool SerialPort::openPort(const QString& portName, qint32 baudRate)
 {
-    if (m_serialPort->isOpen())
+    if (m_serialPort.isOpen())
         closePort();
 
-    m_serialPort->setPortName(portName);
-    m_serialPort->setBaudRate(baudRate);
-    m_serialPort->setDataBits(QSerialPort::Data8);
-    m_serialPort->setParity(QSerialPort::NoParity);
-    m_serialPort->setStopBits(QSerialPort::OneStop);
-    m_serialPort->setFlowControl(QSerialPort::NoFlowControl);
+    m_serialPort.setPortName(portName);
+    m_serialPort.setBaudRate(baudRate);
+    m_serialPort.setDataBits(QSerialPort::Data8);
+    m_serialPort.setParity(QSerialPort::NoParity);
+    m_serialPort.setStopBits(QSerialPort::OneStop);
+    m_serialPort.setFlowControl(QSerialPort::NoFlowControl);
 
-    if (!m_serialPort->open(QIODevice::ReadWrite))
+    if (!m_serialPort.open(QIODevice::ReadWrite)) {
+        QString errorString = m_serialPort.errorString();
+        emit portError(errorString);
+        Logger::instance().warning("Ошибка при открытии порта" + portName + ":" + errorString);
         return false;
+    }
 
-    auto tInterval = Settings::instance().app().timeSyncInterval * 1000;
-    syncTimer.start(tInterval);
+    dataTimeoutTimer.start();
+    Logger::instance().info("Порт " + m_serialPort.portName() + " успешно открыт");
 
+    if (Settings::instance().app().timeSyncOn) {
+        auto tInterval = Settings::instance().app().timeSyncInterval * 1000;
+        syncTimer.start(tInterval);
+    }
     return true;
 }
 
 void SerialPort::closePort()
 {
     syncTimer.stop();
-    if (m_serialPort->isOpen())
-        m_serialPort->close();
+    dataTimeoutTimer.stop();
+    if (m_serialPort.isOpen()) {
+        m_serialPort.close();
+        Logger::instance().info("Порт " + m_serialPort.portName() + "закрыт");
+    }
+
+}
+
+void SerialPort::checkDataTimeout()
+{
+    Logger::instance().warning(m_serialPort.portName() + ": Прекращение поступления данных, ожидаем восстановление соединения...");
+    syncTimer.stop();
+    emit dataTimeout();
 }

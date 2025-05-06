@@ -21,18 +21,20 @@ public:
     static QStringList availablePorts();
 
 signals:
-    void dataReceived(const QByteArray& data_);
     void portError(const QString& errorString);
-
+    void dataTimeout();
+    void dataRestored();
     void setTime(const QString& UTSDate, const QString& UTSTime);
 
 private slots:
     void handleReadyRead();
     void handleError(QSerialPort::SerialPortError error);
+    void checkDataTimeout();
 
 private:
-    QSerialPort* m_serialPort;
+    QSerialPort m_serialPort;
     QString m_localBuf{ "0" };
     TimeSynchronizer* timeSynchronizer{ nullptr };
     QTimer syncTimer{ this };
+    QTimer dataTimeoutTimer{ this };
 };

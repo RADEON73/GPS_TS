@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QDateTime>
 #include "../core/Logger.h"
+#include <QJsonObject>
+#include <QJsonDocument>
 
 constexpr auto SYNC_TIME_TAG = "SYNC_CURRENT_TIME_RESPONSE";
 
@@ -47,9 +49,20 @@ void TCPServer::onReadyRead()
 	QByteArray request = client->readAll();
 	if (request == SYNC_TIME_TAG) {
 		Logger::instance().debug("Получили запрос на синхронизацию времени");
-		QByteArray timeData = timeSynchronizer->timeToBinary();
-		client->write(timeData);
-		Logger::instance().debug("Клиенту отправлено актуальное время");
+
+		// Создаем JSON объект для ответа
+		QJsonObject response;
+		if (isActual) {
+			response["status"] = "success";
+			response["timeData"] = QString(timeSynchronizer->timeToBinary().toBase64());
+		}
+		else {
+			response["status"] = "error";
+			response["message"] = "Время на сервере не синхронизировано.";
+		}
+		QJsonDocument doc(response);
+		client->write(doc.toJson());
+		Logger::instance().debug("Отправили ответ на запрос на синхронизацию времени");
 	}
 }
 
@@ -62,4 +75,14 @@ void TCPServer::onDisconnected()
 	clients.removeOne(client);
 	client->deleteLater();
 	Logger::instance().info("TCP клиент отключен.");
+}
+
+void TCPServer::setDataActual()
+{
+	isActual = true;
+}
+
+void TCPServer::setDataNotActual()
+{
+	isActual = false;
 }

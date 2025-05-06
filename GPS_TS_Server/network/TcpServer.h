@@ -14,11 +14,17 @@ public:
 protected:
 	void incomingConnection(qintptr socketDescriptor) override;
 
+public slots:
+	void setDataActual();
+	void setDataNotActual();
+
 private slots:
 	void onReadyRead();
 	void onDisconnected();
 
+
 private:
 	QList<QTcpSocket*> clients;
 	TimeSynchronizer* timeSynchronizer{ nullptr };
+	bool isActual{ true }; //Флаг того, можно ли считать данные на сервере актуальными
 };

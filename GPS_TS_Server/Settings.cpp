@@ -44,8 +44,7 @@ void Settings::loadSettings()
     m_logging.logGSV = m_qsettings.value("logGSV", false).toBool();
     m_logging.logVTG = m_qsettings.value("logVTG", false).toBool();
     m_logging.logPMTK = m_qsettings.value("logPMTK", false).toBool();
-    m_logging.logToFile = m_qsettings.value("Enabled", false).toBool();
-    m_logging.path = m_qsettings.value("Path", "logs/app.log").toString();
+    m_logging.logToFile = m_qsettings.value("logToFile", false).toBool();
     m_qsettings.endGroup();
 
     m_qsettings.beginGroup("App");
@@ -75,7 +74,6 @@ void Settings::saveSettings()
     m_qsettings.setValue("logVTG", m_logging.logVTG);
     m_qsettings.setValue("logPMTK", m_logging.logPMTK);
     m_qsettings.setValue("logToFile", m_logging.logToFile);
-    m_qsettings.setValue("Path", m_logging.path);
     m_qsettings.endGroup();
 
     m_qsettings.beginGroup("App");
@@ -110,8 +108,7 @@ void Settings::setLogging(const Logging& settings)
         m_logging.logGSV != settings.logGSV ||
         m_logging.logVTG != settings.logVTG ||
         m_logging.logPMTK != settings.logPMTK ||
-        m_logging.logToFile != settings.logToFile ||
-        m_logging.path != settings.path) {
+        m_logging.logToFile != settings.logToFile) {
         m_logging = settings;
         saveSettings();
         emit loggingSettingsChanged(m_logging);

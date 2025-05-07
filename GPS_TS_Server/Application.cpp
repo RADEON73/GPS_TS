@@ -12,6 +12,9 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
     setOrganizationName("RADEON");
     setApplicationName("GPS_TS_Server");
 
+    auto& logToFile = Settings::instance().logging().logToFile;
+    Logger::instance().init("", true, logToFile);
+
     auto& comPort = Settings::instance().serial().port;
     serial_port.openPort(comPort);
 

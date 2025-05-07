@@ -6,6 +6,15 @@
 #include <windows.h>
 #endif
 
+inline QString systemTimeToString(const SYSTEMTIME& st)
+{
+	QDate date(st.wYear, st.wMonth, st.wDay);
+	QTime time(st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+	QDateTime dt(date, time);
+
+	return dt.toString("yyyy-MM-dd hh:mm:ss.zzz");
+}
+
 TimeSynchronizer::TimeSynchronizer(QObject* parent) : QObject(parent)
 {
 }
@@ -32,7 +41,7 @@ void TimeSynchronizer::synchronizeTime()
 		if (auto sysTime = time(); !SetLocalTime(&sysTime))
 			Logger::instance().warning("Ошибка при попытке установки системного времени");
 		else
-			Logger::instance().info("Время было успешно установлено");
+			Logger::instance().info("Время было успешно установлено " + systemTimeToString(sysTime));
 		return;
 #endif
 }

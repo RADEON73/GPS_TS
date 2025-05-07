@@ -9,6 +9,7 @@
 #include <qobjectdefs.h>
 #include <qstring.h>
 #include <qtextstream.h>
+#include <qdir.h>
 
 Logger& Logger::instance()
 {
@@ -16,21 +17,22 @@ Logger& Logger::instance()
     return instance;
 }
 
-Logger::Logger(QObject* parent) : QObject(parent), m_consoleOutput(true), m_enabled(true)
-{}
+Logger::Logger(QObject* parent) : QObject(parent)
+{
+}
 
 Logger::~Logger()
 {
-    if (m_logFile.isOpen()) {
+    if (m_logFile.isOpen())
         m_logFile.close();
-    }
 }
 
-void Logger::init(const QString& logFilePath, bool consoleOutput)
+void Logger::init(const QString& logFilePath, bool consoleOutput, bool enableFileLogging)
 {
     QMutexLocker locker(&m_mutex);
 
     m_consoleOutput = consoleOutput;
+    m_fileLoggingEnabled = enableFileLogging;
 
     if (!logFilePath.isEmpty()) {
         m_logFile.setFileName(logFilePath);
@@ -50,13 +52,15 @@ void Logger::log(LogLevel level, const QString& message, const QString& category
 
     QMutexLocker locker(&m_mutex);
 
+    if (m_fileLoggingEnabled)
+        openLogFile();
+
     const QString formatted = formatMessage(level, message, category);
 
-    if (m_consoleOutput) {
+    if (m_consoleOutput)
         qDebug().noquote() << formatted;
-    }
 
-    if (m_logFile.isOpen()) {
+    if (m_fileLoggingEnabled  && m_logFile.isOpen()) {
         m_fileStream << formatted << Qt::endl;
         m_fileStream.flush();
     }
@@ -82,13 +86,56 @@ QString Logger::formatMessage(LogLevel level, const QString& message, const QStr
         .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"))
         .arg(levelToString(level));
 
-    if (!category.isEmpty()) {
+    if (!category.isEmpty())
         formatted += QString(" [%1]").arg(category);
-    }
 
     formatted += QString(": %1").arg(message);
 
     return formatted;
+}
+
+void Logger::createLogDirectory() const
+{
+    QDir logDir(m_logDirectory);
+    if (!logDir.exists())
+        logDir.mkpath(".");
+    //TODO : нужна обработка ошибок при создании директории!
+}
+
+void Logger::openLogFile()
+{
+    createLogDirectory();
+
+    QString appName = QCoreApplication::applicationName();
+    if (appName.isEmpty())
+        appName = "application";
+
+    QString dateStr = QDateTime::currentDateTime().toString("yyyyMMdd");
+    QString fileName = QString("%1/%2_%3.log").arg(m_logDirectory).arg(appName).arg(dateStr);
+
+    if (m_logFile.isOpen()) {
+        // Если файл уже открыт и это тот же файл, ничего не делаем
+        if (m_logFile.fileName() == fileName)
+            return;
+        // Если это другой файл, закрываем текущий
+        m_logFile.close();
+    }
+    m_logFile.setFileName(fileName);
+    if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+        emit logMessage(formatMessage(LogLevel::Error,
+            QString("Failed to open log file: %1").arg(fileName), "Logger"));
+        return;
+    }
+    m_fileStream.setDevice(&m_logFile);
+}
+
+void Logger::setFileLoggingEnabled(bool enabled)
+{
+    QMutexLocker locker(&m_mutex);
+    m_fileLoggingEnabled = enabled;
+
+    if (!enabled && m_logFile.isOpen())
+        m_logFile.close();
 }
 
 // Convenience methods

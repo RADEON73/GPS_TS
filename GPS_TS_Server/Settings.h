@@ -30,7 +30,6 @@ public:
         bool logVTG;
         bool logPMTK;
         bool logToFile;
-        QString path;
     };
 
     struct App

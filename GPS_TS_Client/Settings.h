@@ -13,7 +13,6 @@ public:
     struct Logging
     {
         bool logToFile;
-        QString path;
     };
 
     struct App

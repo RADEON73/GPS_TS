@@ -28,8 +28,7 @@ void Settings::Init()
 void Settings::loadSettings()
 {
     m_qsettings.beginGroup("Logging");
-    m_logging.logToFile = m_qsettings.value("Enabled", false).toBool();
-    m_logging.path = m_qsettings.value("Path", "logs/app.log").toString();
+    m_logging.logToFile = m_qsettings.value("logToFile", false).toBool();
     m_qsettings.endGroup();
 
     m_qsettings.beginGroup("App");
@@ -44,7 +43,6 @@ void Settings::saveSettings()
 {
     m_qsettings.beginGroup("Logging");
     m_qsettings.setValue("logToFile", m_logging.logToFile);
-    m_qsettings.setValue("Path", m_logging.path);
     m_qsettings.endGroup();
 
     m_qsettings.beginGroup("App");
@@ -59,8 +57,7 @@ void Settings::saveSettings()
 
 void Settings::setLogging(const Logging& settings)
 {
-    if (m_logging.logToFile != settings.logToFile ||
-        m_logging.path != settings.path) {
+    if (m_logging.logToFile != settings.logToFile) {
         m_logging = settings;
         saveSettings();
         emit loggingSettingsChanged(m_logging);

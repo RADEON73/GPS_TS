@@ -1,6 +1,6 @@
 #pragma once
 #include "NmeaIParser.h"
-#include <memory>
+#include <qstringlist.h>
 
 class nmeaGSV : public nmeaIParser //GSV---GNSS Satellites in View
 {

@@ -1,9 +1,9 @@
 #include "Settings.h"
-#include <QCoreApplication>
-#include <QDebug>
-#include <QDir>
-
-#include <iostream>
+#include <qcoreapplication.h>
+#include <qdir.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qsettings.h>
 
 Settings& Settings::instance()
 {

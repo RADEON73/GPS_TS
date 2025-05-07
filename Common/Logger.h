@@ -1,9 +1,10 @@
 #pragma once
-#include <QObject>
-#include <QFile>
-#include <QTextStream>
-#include <QMutex>
-#include <QDateTime>
+#include <qfile.h>
+#include <qmutex.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qstring.h>
+#include <qtextstream.h>
 
 class Logger : public QObject
 {

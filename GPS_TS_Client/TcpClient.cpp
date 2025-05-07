@@ -1,9 +1,17 @@
 #include "TcpClient.h"
-#include <QDebug>
-#include "../core/Logger.h"
-#include "../core/Settings.h"
-#include <QJsonObject>
-#include <QJsonDocument>
+#include "Logger.h"
+#include "Settings.h"
+#include <qbytearray.h>
+#include <qglobal.h>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qstring.h>
+#include <qtimer.h>
+#include <qabstractsocket.h>
+#include <qtcpsocket.h>
+#include <TimeSynchronizer.h>
 
 constexpr auto SYNC_TIME_TAG = "SYNC_CURRENT_TIME_RESPONSE";
 constexpr int RECONNECT_INTERVAL_MS = 5000; // 5 seconds between stop attempts

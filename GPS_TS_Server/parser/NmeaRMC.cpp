@@ -1,12 +1,8 @@
+#include "Logger.h"
+#include "NmeaIParser.h"
 #include "NmeaRMC.h"
-#ifdef Q_OS_WIN
-#include <windows.h>
-#elif defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
-#include <sys/time.h>
-#endif
-#include "../core/Settings.h"
-#include "../core/Logger.h"
-#include <optional>
+#include "Settings.h"
+#include <qstringlist.h>
 
 NmeaIData nmeaRMC::parse(const QStringList & str)
 {

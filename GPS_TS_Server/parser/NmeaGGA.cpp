@@ -1,6 +1,8 @@
 #include "NmeaGGA.h"
-#include "../core/Settings.h"
-#include "../core/Logger.h"
+#include "NmeaIParser.h"
+#include "Settings.h"
+#include <Logger.h>
+#include <qstringlist.h>
 
 NmeaIData nmeaGGA::parse(const QStringList& str)
 {

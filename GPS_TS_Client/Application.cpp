@@ -1,6 +1,5 @@
 #include "Application.h"
 #include "Settings.h"
-#include <iostream>
 
 Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
 {

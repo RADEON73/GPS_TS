@@ -1,11 +1,13 @@
 //  ласс дл¤ работы с последовательным портом
 #pragma once
-#include <QtCore/qobject.h>
-#include <QtSerialPort/qserialport.h>
-#include <QtCore/qstring.h>
-#include <QtCore/qobjectdefs.h>
-#include <QTimer>
-#include "../core/TimeSynchronizer.h"
+#include "TimeSynchronizer.h"
+#include <qglobal.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qserialport.h>
+#include <qstring.h>
+#include <qstringlist.h>
+#include <qtimer.h>
 
 class SerialPort : public QObject
 {

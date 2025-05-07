@@ -1,6 +1,6 @@
 #pragma once
 #include "NmeaIParser.h"
-#include <memory>
+#include <qstringlist.h>
 
 class nmeaVTG : public nmeaIParser //VTG - Course over ground and ground speed
 {

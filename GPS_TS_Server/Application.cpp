@@ -1,6 +1,11 @@
 #include "Application.h"
-#include "Settings.h"
 #include "Logger.h"
+#include "SerialPort.h"
+#include "Settings.h"
+#include "TcpServer.h"
+#include <qcoreapplication.h>
+#include <qhostaddress.h>
+#include <qstring.h>
 
 Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
 {

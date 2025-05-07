@@ -1,7 +1,10 @@
 #pragma once
-#include <QObject>
-#include <QTimer>
-#include <QDateTime>
+#include <qsystemdetection.h>
+#include <qbytearray.h>
+#include <qdatetime.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qstring.h>
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
@@ -18,11 +21,6 @@ public:
     void timeFromBinary(const QByteArray& timeData);
 
     QDateTime currentTime() const { return m_timeVariable; }
-
-signals:
-    void syncStarted();
-    void syncStopped();
-    void timeSynchronized(const QDateTime& newTime);
 
 public slots:
     void synchronizeTime();

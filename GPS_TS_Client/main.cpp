@@ -1,6 +1,4 @@
-#include <QtCore/QCoreApplication>
-#include <QtCore/QTextCodec>
-#include "core/Application.h"
+#include "Application.h"
 #include "encoding_fix.h"
 
 using namespace std;

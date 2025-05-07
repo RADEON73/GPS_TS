@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project("GPS_TS" VERSION 1.0.0 LANGUAGES CXX)
+project(GPS_TS VERSION 1.0.0 LANGUAGES CXX)
 
 # Общие настройки для всего проекта
 set(CMAKE_CXX_STANDARD 20)
@@ -27,5 +27,6 @@ if(WIN32)
     add_compile_definitions("_WIN32_WINNT=0x0A00" "WINVER=0x0A00")
 endif()
 
-add_subdirectory("GPS_TS_Server")
-add_subdirectory("GPS_TS_Client")
+add_subdirectory(Common)
+add_subdirectory(GPS_TS_Server)
+add_subdirectory(GPS_TS_Client)

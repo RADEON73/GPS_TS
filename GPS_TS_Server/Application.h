@@ -1,10 +1,8 @@
 #pragma once
-#include <QtCore/QCoreApplication>
-#include <QDateTime>
-#include "../network/SerialPort.h"
-#include "Settings.h"
-#include "../network/TcpServer.h"
+#include "SerialPort.h"
+#include "TcpServer.h"
 #include "TimeSynchronizer.h"
+#include <qcoreapplication.h>
 
 class Application : public QCoreApplication
 {

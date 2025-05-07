@@ -1,6 +1,6 @@
 #pragma once
 #include "NmeaIParser.h"
-#include <memory>
+#include <qstringlist.h>
 
 class nmeaGSA : public nmeaIParser //GSA---GNSS DOP and Active Satellites
 {

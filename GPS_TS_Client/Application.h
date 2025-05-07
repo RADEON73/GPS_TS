@@ -1,8 +1,7 @@
 #pragma once
-#include <QtCore/QCoreApplication>
-#include "../network/TCPClient.h"
-#include "Settings.h"
+#include "TCPClient.h"
 #include "TimeSynchronizer.h"
+#include <qcoreapplication.h>
 
 class Application : public QCoreApplication
 {

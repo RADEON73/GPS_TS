@@ -1,13 +1,21 @@
+#include "Logger.h"
+#include "NmeaIParser.h"
+#include "NmeaParserFactory.h"
 #include "SerialPort.h"
-#include <QtSerialPort/qserialportinfo.h>
-#include <QtCore/qdebug.h>
-#include <QtCore/qiodevice.h>
-#include <iostream>
-#include "../parser/NmeaParserFactory.h"
+#include "Settings.h"
+#include <qglobal.h>
+#include <qiodevice.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qregularexpression.h>
+#include <qserialport.h>
+#include <qserialportinfo.h>
+#include <qstring.h>
+#include <qstringlist.h>
+#include <qstringview.h>
+#include <qtimer.h>
+#include <TimeSynchronizer.h>
 #include <variant>
-#include "../core/Settings.h"
-#include "../core/Logger.h"
-#include <QRegularExpression>
 
 constexpr int DATA_LOST_INTERVAL_MS = 5000;
 

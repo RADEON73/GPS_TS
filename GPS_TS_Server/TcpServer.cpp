@@ -1,9 +1,15 @@
+#include "Logger.h"
 #include "TcpServer.h"
-#include <QDebug>
-#include <QDateTime>
-#include "../core/Logger.h"
-#include <QJsonObject>
-#include <QJsonDocument>
+#include <qabstractsocket.h>
+#include <qbytearray.h>
+#include <qglobal.h>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
+#include <qobject.h>
+#include <qstring.h>
+#include <qtcpserver.h>
+#include <qtcpsocket.h>
+#include <TimeSynchronizer.h>
 
 constexpr auto SYNC_TIME_TAG = "SYNC_CURRENT_TIME_RESPONSE";
 

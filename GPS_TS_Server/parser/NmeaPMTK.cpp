@@ -1,6 +1,8 @@
+#include "Logger.h"
+#include "NmeaIParser.h"
 #include "NmeaPMTK.h"
-#include "../core/Settings.h"
-#include "../core/Logger.h"
+#include "Settings.h"
+#include <qstringlist.h>
 
 NmeaIData Nmea_PMTK::parse(const QStringList & str)
 {

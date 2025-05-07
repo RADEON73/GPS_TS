@@ -1,12 +1,13 @@
 #pragma once
-#include <memory>
-#include "NmeaRMC.h"
 #include "NmeaGGA.h"
 #include "NmeaGLL.h"
 #include "NmeaGSA.h"
-#include "NmeaPMTK.h"
 #include "NmeaGSV.h"
+#include "NmeaIParser.h"
+#include "NmeaPMTK.h"
+#include "NmeaRMC.h"
 #include "NmeaVTG.h"
+#include <memory>
 
 class NmeaParserFactory
 {

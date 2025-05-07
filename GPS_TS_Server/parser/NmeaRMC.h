@@ -1,7 +1,6 @@
 #pragma once
 #include "NmeaIParser.h"
-#include <memory>
-#include <QDateTime>
+#include <qstringlist.h>
 
 class nmeaRMC : public nmeaIParser //RMC---Recommended Minimum Specific GNSS Data
 {

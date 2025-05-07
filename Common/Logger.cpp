@@ -1,14 +1,14 @@
 #pragma once
 #include "Logger.h"
-#include <QDebug>
-#include <QObject>
-#include <QFile>
-#include <QTextStream>
-#include <QMutex>
-#include <QDateTime>
-#include <QIODevice>
-#include <QMutexLocker>
-#include <QString>
+#include <qdatetime.h>
+#include <qdebug.h>
+#include <qiodevice.h>
+#include <qlogging.h>
+#include <qmutex.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qstring.h>
+#include <qtextstream.h>
 
 Logger& Logger::instance()
 {

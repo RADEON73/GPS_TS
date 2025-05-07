@@ -1,7 +1,6 @@
 #pragma once
 #include "NmeaIParser.h"
-#include <memory>
-#include <memory>
+#include <qstringlist.h>
 
 class nmeaGGA : public nmeaIParser //GGA--- Global Positioning System Fixed Data
 {

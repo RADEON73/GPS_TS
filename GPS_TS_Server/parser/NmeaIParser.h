@@ -1,6 +1,8 @@
 #pragma once
-#include <QStringList>
 #include <variant>
+#include <xutility>
+#include <qstring.h>
+#include <qstringlist.h>
 
 struct PMTK_Data
 {

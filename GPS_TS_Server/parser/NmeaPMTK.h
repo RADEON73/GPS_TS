@@ -1,6 +1,5 @@
 #pragma once
 #include "NmeaIParser.h"
-#include <memory>
 
 class Nmea_PMTK : public nmeaIParser
 {

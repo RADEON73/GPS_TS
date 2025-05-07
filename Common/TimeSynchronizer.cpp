@@ -1,9 +1,10 @@
+#include "Logger.h"
 #include "TimeSynchronizer.h"
-#include <QDataStream>
+#include <qsystemdetection.h>
+#include <qdatastream.h>
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
-#include "../../GPS_TS_Client/core/Logger.h"
 
 TimeSynchronizer::TimeSynchronizer(QObject* parent) : QObject(parent)
 {
@@ -32,9 +33,8 @@ void TimeSynchronizer::synchronizeTime()
 			Logger::instance().warning("Ошибка при попытке установки системного времени");
 		else
 			Logger::instance().info("Время было успешно установлено");
-		return ;
+		return;
 #endif
-        emit timeSynchronized(m_timeVariable);
 }
 
 void TimeSynchronizer::setTime(const QString& UTSDate, const QString& UTSTime)

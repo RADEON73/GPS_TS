@@ -1,7 +1,12 @@
 #pragma once
-#include <QTcpSocket>
-#include <QTimer>
-#include "../core/TimeSynchronizer.h"
+#include "TimeSynchronizer.h"
+#include <qglobal.h>
+#include <qobject.h>
+#include <qobjectdefs.h>
+#include <qstring.h>
+#include <qtimer.h>
+#include <qabstractsocket.h>
+#include <qtcpsocket.h>
 
 class TcpClient : public QObject
 {

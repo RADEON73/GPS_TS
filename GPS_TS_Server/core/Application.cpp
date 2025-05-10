@@ -1,8 +1,6 @@
 #include "Application.h"
 #include "Settings.h"
-#include <iostream>
 #include "Logger.h"
-
 
 Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
 {
@@ -13,12 +11,19 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
     serial_port.openPort(comPort);
 
     auto& tcpPort = Settings::instance().app().port;
-    if (!app.listen(QHostAddress::Any, tcpPort))
-        Logger::instance().error("TcpServer could not start!");
-    Logger::instance().info(QString("TcpServer started on port %1").arg(tcpPort));
+    if (!server.listen(QHostAddress::Any, tcpPort))
+        Logger::instance().error("Не удалось запустить приложение!");
+    Logger::instance().info(QString("Приложение запущено на порту %1").arg(tcpPort));
+
+    synchronizer.setSyncInterval(Settings::instance().app().timeSyncInterval);
+    if (Settings::instance().app().timeSyncOn)
+        synchronizer.startSync();
+
+	connect(&serial_port, &SerialPort::setTime, &synchronizer, &TimeSynchronizer::setTime);
 }
 
 Application::~Application()
 {
+    synchronizer.stopSync();
     serial_port.closePort(); 
 }

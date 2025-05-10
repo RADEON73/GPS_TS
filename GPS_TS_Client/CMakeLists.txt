@@ -31,6 +31,7 @@ target_sources(${PROJECT_NAME}_Client PUBLIC
     main.cpp
     core/Settings.cpp core/Settings.h
 	core/Application.cpp core/Application.h
+	core/TimeSynchronizer.cpp core/TimeSynchronizer.h
 	core/Logger.cpp core/Logger.h
     network/TcpClient.cpp network/TcpClient.h
 	encoding_fix.h
@@ -47,6 +48,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
     FILES 
         ${CMAKE_CURRENT_SOURCE_DIR}/core/Settings.h
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Application.h
+		${CMAKE_CURRENT_SOURCE_DIR}/core/TimeSynchronizer.h
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Logger.h
         ${CMAKE_CURRENT_SOURCE_DIR}/network/TcpClient.h
 )
@@ -57,6 +59,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/core/Settings.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Application.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/core/TimeSynchronizer.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/core/Logger.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/network/TcpClient.cpp
 )

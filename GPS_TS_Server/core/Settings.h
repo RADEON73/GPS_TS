@@ -27,14 +27,14 @@ public:
         bool logGSV;
         bool logVTG;
         bool logPMTK;
-
         bool logToFile;
         QString path;
     };
 
-    struct TcpServer
+    struct App
     {
-        QString ip;
+        bool timeSyncOn;
+        int timeSyncInterval;
         int port;
     };
 
@@ -43,17 +43,17 @@ public:
     // Доступ к группам настроек
     const Serial& serial() const { return m_serial; }
     const Logging& logging() const { return m_logging; }
-    const TcpServer& app() const { return m_app; }
+    const App& app() const { return m_app; }
 
     // Обновление настроек
     void setSerial(const Serial& settings);
     void setLogging(const Logging& settings);
-    void appServer(const TcpServer& settings);
+    void appServer(const App& settings);
 
 signals:
     void serialSettingsChanged(const Serial& newSettings);
     void loggingSettingsChanged(const Logging& newSettings);
-    void appSettingsChanged(const TcpServer& newSettings);
+    void appSettingsChanged(const App& newSettings);
 
 private:
     explicit Settings(QObject* parent = nullptr);
@@ -66,5 +66,5 @@ private:
     QSettings m_qsettings;
     Serial m_serial;
     Logging m_logging;
-    TcpServer m_app;
+    App m_app;
 };

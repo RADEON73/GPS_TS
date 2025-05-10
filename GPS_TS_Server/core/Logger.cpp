@@ -94,7 +94,9 @@ QString Logger::formatMessage(LogLevel level, const QString& message, const QStr
 // Convenience methods
 void Logger::debug(const QString& message, const QString& category)
 {
+#if _DEBUG
     log(LogLevel::Debug, message, category);
+#endif
 }
 
 void Logger::info(const QString& message, const QString& category)

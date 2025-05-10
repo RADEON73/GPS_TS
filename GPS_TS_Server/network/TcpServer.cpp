@@ -3,53 +3,63 @@
 #include <QDateTime>
 #include "../core/Logger.h"
 
-TcpServer::TcpServer(QObject* parent) : QTcpServer(parent) {}
+constexpr auto SYNC_TIME_TAG = "SYNC_CURRENT_TIME_RESPONSE";
 
-TcpServer::~TcpServer()
+TCPServer::TCPServer(TimeSynchronizer* timeSynchronizer, QObject* parent) :
+	QTcpServer(parent),
+	timeSynchronizer(timeSynchronizer)
 {
+	Logger::instance().debug("Сервер конструируется.");
+}
+
+TCPServer::~TCPServer()
+{
+	Logger::instance().debug("Сервер разрушается и удаляет клиентов.");
 	for (auto client : clients) {
 		client->disconnectFromHost();
 		if (client->state() == QAbstractSocket::ConnectedState)
 			client->waitForDisconnected();
 		delete client;
 	}
+	Logger::instance().debug("Сервер закрылся.");
 }
 
-void TcpServer::incomingConnection(qintptr socketDescriptor)
+void TCPServer::incomingConnection(qintptr socketDescriptor)
 {
+	Logger::instance().debug("У сервера входящее соединение");
 	auto client = new QTcpSocket(this);
 	client->setSocketDescriptor(socketDescriptor);
 	clients.append(client);
 
-	connect(client, &QTcpSocket::readyRead, this, &TcpServer::onReadyRead);
-	connect(client, &QTcpSocket::disconnected, this, &TcpServer::onDisconnected);
+	connect(client, &QTcpSocket::readyRead, this, &TCPServer::onReadyRead);
+	connect(client, &QTcpSocket::disconnected, this, &TCPServer::onDisconnected);
 
-	Logger::instance().info(QString("New client connected:").arg(client->peerAddress().toString()));
+	Logger::instance().info("TCP клиент подключен.");
+	//Logger::instance().info(QString("Новый клиент подключен:").arg(client->peerAddress().toString()));
 }
 
-void TcpServer::onReadyRead()
+void TCPServer::onReadyRead()
 {
+	Logger::instance().debug("Сервер инициализировал чтение данных.");
 	QTcpSocket* client = qobject_cast<QTcpSocket*>(sender());
-	if (!client) return;
-
-	QString request = QString::fromUtf8(client->readAll());
-
-	Logger::instance().info(QString("Received request from client:").arg(request));
-
-	if (request.trimmed() == "SYNC_CURRENT_TIME_RESPONSE") {
-
-		QString response = "Hello from app! Current time: " + QDateTime::currentDateTime().toString();
-		client->write(response.toUtf8());
+	if (!client) 
+		return;
+	QByteArray request = client->readAll();
+	if (request == SYNC_TIME_TAG) {
+		Logger::instance().debug("Получили запрос на синхронизацию времени");
+		QByteArray timeData = timeSynchronizer->currentTimeToBinary();
+		client->write(timeData);
+		Logger::instance().debug("Клиенту отправлено актуальное время");
 	}
 }
 
-void TcpServer::onDisconnected()
+void TCPServer::onDisconnected()
 {
+	Logger::instance().debug("Клиент отключается от сервера.");
 	QTcpSocket* client = qobject_cast<QTcpSocket*>(sender());
-	if (!client) return;
-
+	if (!client) 
+		return;
 	clients.removeOne(client);
 	client->deleteLater();
-
-	Logger::instance().info("TcpClient disconnected");
+	Logger::instance().info("TCP клиент отключен.");
 }

@@ -19,8 +19,10 @@ public:
     static QStringList availablePorts();
 
 signals:
-    void dataReceived(const QByteArray& data);
+    void dataReceived(const QByteArray& data_);
     void portError(const QString& errorString);
+
+    void setTime(const QString& UTSDate, const QString& UTSTime);
 
 private slots:
     void handleReadyRead();

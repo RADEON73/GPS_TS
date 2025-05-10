@@ -4,6 +4,7 @@
 #include <QtCore/qiodevice.h>
 #include <iostream>
 #include "../parser/NmeaParserFactory.h"
+#include <variant>
 
 SerialPort::SerialPort(QObject* parent) : QObject(parent)
 {
@@ -38,9 +39,12 @@ void SerialPort::handleReadyRead()
             m_localBuf.remove('\r');
             if (m_localBuf[0] == '$') {
                 if (auto nmeaParser = NmeaParserFactory::createParser(m_localBuf)) {
-                    nmeaParser->parse(m_localBuf.split(','));
-                    nmeaParser->process();
+                    auto data = nmeaParser->parse(m_localBuf.split(','));
+                    if (auto rmcData = std::get_if<RMC_Data>(&data)) {
+                        emit setTime(rmcData->Date, rmcData->UTC_Time);
+                    }
                 }
+
             }
             m_localBuf.clear();
         }

@@ -1,8 +1,10 @@
 #pragma once
 #include <QtCore/QCoreApplication>
+#include <QDateTime>
 #include "../network/SerialPort.h"
 #include "Settings.h"
 #include "../network/TcpServer.h"
+#include "TimeSynchronizer.h"
 
 class Application : public QCoreApplication
 {
@@ -14,5 +16,6 @@ public:
 
 private:
     SerialPort serial_port;
-    TcpServer app;
+    TimeSynchronizer synchronizer;
+    TCPServer server{ &synchronizer };
 };

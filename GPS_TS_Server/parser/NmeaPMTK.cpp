@@ -2,10 +2,12 @@
 #include "../core/Settings.h"
 #include "../core/Logger.h"
 
-void Nmea_PMTK::parse(const QStringList & str)
+NmeaIData Nmea_PMTK::parse(const QStringList & str)
 {
+	PMTK_Data data_;
 	if (Settings::instance().logging().logPMTK)
 		Logger::instance().info(str.join(","));
+	return data_;
 }
 
 void Nmea_PMTK::process()

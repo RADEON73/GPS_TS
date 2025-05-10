@@ -6,10 +6,9 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
 {
     setOrganizationName("RADEON");
     setApplicationName("GPS_TS_Client");
+    auto& ip = Settings::instance().app().ip;
+    auto& tcpPort = Settings::instance().app().port;
+    client.connectToServer(ip, tcpPort);
 
-    client.connectToServer("127.0.0.1", 2222);
-}
-
-Application::~Application()
-{
+    synchronizer.setSyncInterval(Settings::instance().app().timeSyncInterval);
 }

@@ -2,6 +2,7 @@
 #include <QtCore/QCoreApplication>
 #include "../network/TCPClient.h"
 #include "Settings.h"
+#include "TimeSynchronizer.h"
 
 class Application : public QCoreApplication
 {
@@ -9,8 +10,9 @@ class Application : public QCoreApplication
 
 public:
     Application(int& argc, char** argv);
-    ~Application() final;
+    ~Application() final = default;
 
 private:
-    TcpClient client;
+    TimeSynchronizer synchronizer;
+    TcpClient client{ &synchronizer };
 };

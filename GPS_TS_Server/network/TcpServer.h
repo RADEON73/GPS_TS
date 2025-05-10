@@ -2,13 +2,14 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
+#include "../core/TimeSynchronizer.h"
 
-class TcpServer : public QTcpServer
+class TCPServer : public QTcpServer
 {
 	Q_OBJECT
 public:
-	explicit TcpServer(QObject* parent = nullptr);
-	~TcpServer() final;
+	explicit TCPServer(TimeSynchronizer* timeSynchronizer, QObject* parent = nullptr);
+	~TCPServer() final;
 
 protected:
 	void incomingConnection(qintptr socketDescriptor) override;
@@ -19,4 +20,5 @@ private slots:
 
 private:
 	QList<QTcpSocket*> clients;
+	TimeSynchronizer* timeSynchronizer{ nullptr };
 };

@@ -1,15 +1,19 @@
 #pragma once
 #include <QTcpSocket>
 #include <QTimer>
+#include "../core/TimeSynchronizer.h"
 
 class TcpClient : public QObject
 {
     Q_OBJECT
 public:
-    explicit TcpClient(QObject* parent = nullptr);
+    explicit TcpClient(TimeSynchronizer* timeSynchronizer, QObject* parent = nullptr);
     ~TcpClient() final;
 
     void connectToServer(const QString& host, quint16 port);
+
+signals:
+    void timeUpdated(const QDateTime& newTime);
 
 private slots:
     void onConnected();
@@ -18,6 +22,7 @@ private slots:
     void requestData();
 
 private:
-    QTcpSocket* socket;
-    QTimer* timer;
+    QTcpSocket socket{ this };
+    QTimer timer{ this };
+    TimeSynchronizer* timeSynchronizer{ nullptr };
 };

@@ -82,16 +82,16 @@ void SerialPort::handleError(QSerialPort::SerialPortError error)
 
     switch (error) {
     case QSerialPort::ResourceError:
-        Logger::instance().warning("Ошибка ресурсов - соединение закрыто:" + errorString);
+        Logger::instance().warning("Ошибка ресурсов - соединение закрыто: " + errorString);
         break;
     case QSerialPort::PermissionError:
-        Logger::instance().warning("Ошибка прав доступа - соединение закрыто:" + errorString);
+        Logger::instance().warning("Ошибка прав доступа - соединение закрыто: " + errorString);
         break;
     case QSerialPort::DeviceNotFoundError:
-        Logger::instance().warning("Устройство не найдено - соединение закрыто:" + errorString);
+        Logger::instance().warning("Устройство не найдено - соединение закрыто: " + errorString);
         break;
     default:
-        Logger::instance().warning("Ошибка серийного порта" + m_serialPort.portName() + ":" + errorString);
+        Logger::instance().warning("Ошибка серийного порта " + m_serialPort.portName() + " : " + errorString);
         break;
     }
     if (m_serialPort.isOpen())
@@ -109,7 +109,7 @@ bool SerialPort::openPort(const QString& portName, qint32 baudRate)
     if (!m_serialPort.open(QIODevice::ReadWrite)) {
         QString errorString = m_serialPort.errorString();
         emit portError(errorString);
-        Logger::instance().warning("Ошибка при открытии порта" + portName + ":" + errorString);
+        Logger::instance().warning("Ошибка при открытии порта " + portName + " : " + errorString);
         return false;
     }
 
@@ -129,7 +129,7 @@ void SerialPort::closePort()
     dataTimeoutTimer.stop();
     if (m_serialPort.isOpen()) {
         m_serialPort.close();
-        Logger::instance().info("Порт " + m_serialPort.portName() + "закрыт");
+        Logger::instance().info("Порт " + m_serialPort.portName() + " закрыт");
     }
 
 }

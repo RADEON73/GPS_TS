@@ -6,7 +6,6 @@
 #include <qstring.h>
 #include <qtextstream.h>
 #include <qcoreapplication.h>
-#include <qdir.h>
 
 class Logger : public QObject
 {

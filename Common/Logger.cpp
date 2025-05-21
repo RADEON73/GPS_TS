@@ -52,17 +52,17 @@ void Logger::log(LogLevel level, const QString& message, const QString& category
 
     QMutexLocker locker(&m_mutex);
 
-    if (m_fileLoggingEnabled)
-        openLogFile();
-
     const QString formatted = formatMessage(level, message, category);
 
     if (m_consoleOutput)
         qDebug().noquote() << formatted;
 
-    if (m_fileLoggingEnabled  && m_logFile.isOpen()) {
-        m_fileStream << formatted << Qt::endl;
-        m_fileStream.flush();
+    if (m_fileLoggingEnabled) {
+        openLogFile();
+        if (m_logFile.isOpen()) {
+            m_fileStream << formatted << Qt::endl;
+            m_fileStream.flush();
+        }
     }
 
     emit logMessage(formatted);

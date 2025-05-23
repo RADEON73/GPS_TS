@@ -28,17 +28,20 @@ set(RESOURCES
 # UI формы
 set(FORMS
     MainWindow.ui
+	Connect.ui
 )
 
 # Заголовочные файлы
 set(HEADERS
     MainWindow.h
+	Connect.h
 )
 
 # Исходные файлы
 set(SOURCES
     main.cpp
     MainWindow.cpp
+	Connect.cpp
 )
 
 # Добавляем исходные файлы

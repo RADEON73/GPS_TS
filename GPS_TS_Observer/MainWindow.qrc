@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>GPS_TS_Observer.ico</file>
+    </qresource>
+</RCC>

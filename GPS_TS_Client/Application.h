@@ -1,5 +1,6 @@
 #pragma once
 #include "TCPClient.h"
+#include "Observer.h"
 #include "TimeSynchronizer.h"
 #include <qcoreapplication.h>
 
@@ -13,5 +14,6 @@ public:
 
 private:
     TimeSynchronizer synchronizer;
-    TcpClient client{ &synchronizer };
+    TcpClient tcpClient{ &synchronizer };
+    Observer observer{ ObserverClientName, this };
 };

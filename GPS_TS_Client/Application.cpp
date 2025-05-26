@@ -10,7 +10,10 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
     auto& logToFile = Settings::instance().logging().logToFile;
     Logger::instance().init("", true, logToFile);
 
+    observer.start();
+    connect(&Logger::instance(), &Logger::logMessage, &observer, &Observer::sendMessage);
+
     auto& ip = Settings::instance().app().ip;
     auto& tcpPort = Settings::instance().app().port;
-    client.connectToServer(ip, tcpPort);
+    tcpClient.connectToServer(ip, tcpPort);
 }

@@ -5,11 +5,12 @@ project(GPS_TS VERSION 1.0.0 LANGUAGES CXX)
 # Общие настройки для всего проекта
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include(qt.cmake)
 
-find_package(QT NAMES Qt5 Qt6 REQUIRED COMPONENTS Core Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
+find_package(QT NAMES Qt5 Qt6 REQUIRED COMPONENTS Core Network Widgets Gui SerialPort)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Widgets Gui SerialPort)
 
 qt_standard_project_setup()
 

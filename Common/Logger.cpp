@@ -143,6 +143,9 @@ void Logger::debug(const QString& message, const QString& category)
 {
 #if _DEBUG
     log(LogLevel::Debug, message, category);
+#else
+    Q_UNUSED(message)
+    Q_UNUSED(category)
 #endif
 }
 

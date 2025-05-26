@@ -15,6 +15,21 @@ inline QString systemTimeToString(const SYSTEMTIME& st)
 	return dt.toString("yyyy-MM-dd hh:mm:ss.zzz");
 }
 
+inline bool needSync(const SYSTEMTIME& newTime)
+{
+	SYSTEMTIME current;
+	GetLocalTime(&current);
+
+	return newTime.wYear != current.wYear
+		|| newTime.wMonth != current.wMonth
+		|| newTime.wDay != current.wDay
+		|| newTime.wHour != current.wHour
+		|| newTime.wMinute != current.wMinute
+		|| newTime.wSecond != current.wSecond
+		|| abs(newTime.wMilliseconds - current.wMilliseconds) >= 1;
+}
+
+
 TimeSynchronizer::TimeSynchronizer(QObject* parent) : QObject(parent)
 {
 }
@@ -35,14 +50,29 @@ void TimeSynchronizer::timeFromBinary(const QByteArray& timeData)
 	m_timeVariable = QDateTime::fromMSecsSinceEpoch(msecs, Qt::UTC);
 }
 
-void TimeSynchronizer::synchronizeTime()
+void TimeSynchronizer::synchronizeTime() const
 {
 #ifdef Q_OS_WIN
-		if (auto sysTime = time(); !SetLocalTime(&sysTime))
-			Logger::instance().warning("Ошибка при попытке установки системного времени");
-		else
-			Logger::instance().info("Время было успешно установлено " + systemTimeToString(sysTime));
+	const SYSTEMTIME newTime = time();
+#ifndef _DEBUG //Оптимизация релизной сборки
+	SYSTEMTIME current;
+	GetLocalTime(&current);
+	const bool skipSync =
+		(newTime.wYear == current.wYear
+			&& newTime.wMonth == current.wMonth
+			&& newTime.wDay == current.wDay
+			&& newTime.wHour == current.wHour
+			&& newTime.wMinute == current.wMinute)
+		&& (abs(newTime.wSecond - current.wSecond) < 1 && abs(newTime.wMilliseconds - current.wMilliseconds) < 100);
+	if (skipSync) {
+		Logger::instance().info("Синхронизация не требуется ввиду малого расхождения с системным временем");
 		return;
+	}
+#endif // _DEBUG
+	if (!SetLocalTime(&newTime))
+		Logger::instance().warning("Ошибка при попытке установки системного времени");
+	else
+		Logger::instance().info("Время было успешно установлено " + systemTimeToString(newTime));
 #endif
 }
 

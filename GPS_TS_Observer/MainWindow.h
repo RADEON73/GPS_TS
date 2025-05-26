@@ -1,20 +1,33 @@
 #pragma once
-#include <QMainWindow>
+#include <qmainwindow.h>
 #include "ui_MainWindow.h"
-#include "Connect.h"
+#include "qtextedit.h"
+#include "qlocalsocket.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow, public Ui::MainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget* parent = nullptr);
-    ~MainWindow() final = default;
+    ~MainWindow() final;
+
+
+private slots:
+    void on_connectBtn_clicked();
+    void readData();
+    void handleError(QLocalSocket::LocalSocketError socketError);
+    void handleDisconnected();
 
 private:
-    Connect connect_ui{this};
+    void appendMessage(const QString& message);
+    void connectToApp();
+    void disconnectFromApp();
+
+    Ui::MainWindow ui;
+    QLocalSocket* m_socket{ nullptr };
 };

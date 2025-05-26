@@ -23,7 +23,7 @@ public:
     QDateTime currentTime() const { return m_timeVariable; }
 
 public slots:
-    void synchronizeTime();
+    void synchronizeTime() const;
     void setTime(const QString& UTSDate, const QString& UTSTime);
 
 #ifdef Q_OS_WIN

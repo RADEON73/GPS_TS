@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(GPS_TS_Server VERSION 1.0.0 LANGUAGES CXX)
 
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS SerialPort)
-
 qt_add_executable(${PROJECT_NAME})
 
 set(SERVER_SOURCES
@@ -79,13 +77,14 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_include_directories(${PROJECT_NAME} 
-    PUBLIC
+    PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/parser
+		${CMAKE_CURRENT_BINARY_DIR}
 )
 
 if (MSVC)
-    target_compile_options(GPS_TS_Server PRIVATE /W4)
+    target_compile_options(GPS_TS_Server PRIVATE /W4 /WX)
 else ()
     target_compile_options(GPS_TS_Server PRIVATE -Wall -Wextra -pedantic)
 endif()

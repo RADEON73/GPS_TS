@@ -6,7 +6,6 @@
 #include <qcoreapplication.h>
 #include <qhostaddress.h>
 #include <qstring.h>
-#include <qlocalsocket.h>
 
 Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
 {
@@ -16,48 +15,23 @@ Application::Application(int& argc, char** argv) : QCoreApplication(argc, argv)
     auto& logToFile = Settings::instance().logging().logToFile;
     Logger::instance().init("", true, logToFile);
 
-    if (!visualizerServer.listen("GPS_TS_Visualizer"))
-        Logger::instance().error("Не удалось запустить сервер для визуализатора!");
-    else
-        connect(&visualizerServer, &QLocalServer::newConnection, this, &Application::onNewConnection);
+    observer.start();
 
     auto& comPort = Settings::instance().serial().port;
-    serial_port.openPort(comPort);
+    serialPort.openPort(comPort);
 
     auto& tcpPort = Settings::instance().app().port;
-    if (!server.listen(QHostAddress::Any, tcpPort))
+    if (!tcpServer.listen(QHostAddress::Any, tcpPort))
         Logger::instance().error("Не удалось запустить приложение!");
     Logger::instance().info(QString("Приложение запущено на порту %1").arg(tcpPort));
 
-    connect(&serial_port, &SerialPort::dataTimeout, &server, &TCPServer::setDataNotActualState);
-    connect(&serial_port, &SerialPort::dataRestored, &server, &TCPServer::setDataActualState);
+    connect(&serialPort, &SerialPort::dataTimeout, &tcpServer, &TCPServer::setDataNotActualState);
+    connect(&serialPort, &SerialPort::dataRestored, &tcpServer, &TCPServer::setDataActualState);
 
-    connect(&Logger::instance(), &Logger::logMessage, this, &Application::sendToVisualizer);
+    connect(&Logger::instance(), &Logger::logMessage, &observer, &Observer::sendMessage);
 }
 
 Application::~Application()
 {
-    visualizerServer.close();
-    serial_port.closePort(); 
-}
-
-void Application::onNewConnection()
-{
-    QLocalSocket* client = visualizerServer.nextPendingConnection();
-    visualizerClients.append(client);
-
-    connect(client, &QLocalSocket::disconnected, [this, client]() {
-        visualizerClients.removeOne(client);
-        client->deleteLater();
-        });
-}
-
-void Application::sendToVisualizer(const QString& message) const
-{
-    for (QLocalSocket* client : visualizerClients) {
-        if (client->state() == QLocalSocket::ConnectedState) {
-            client->write(message.toUtf8());
-            client->flush();
-        }
-    }
+    serialPort.closePort();
 }

@@ -1,6 +1,10 @@
 #include "MainWindow.h"
 #include <qdatetime.h>
 #include "../Common/Observer.h"
+#include <qmessagebox.h>
+#include <qfile.h>
+#include <qurl.h>
+#include <qdesktopservices.h>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
@@ -24,6 +28,41 @@ void MainWindow::on_connectBtn_clicked()
 		disconnectFromApp();
     else
         connectToApp();
+}
+
+void MainWindow::on_openConfigBtn_clicked()
+{
+    if (!m_socket || m_socket->state() != QLocalSocket::ConnectedState) {
+        QMessageBox::warning(this, "Ошибка", "Нет подключения к приложению");
+        return;
+    }
+
+    requestConfigPath();
+}
+
+// Метод для запроса пути к конфигу
+void MainWindow::requestConfigPath()
+{
+    m_socket->write("GET_CONFIG_PATH");
+
+    if (m_socket->waitForReadyRead(1000)) {
+        QString configPath = QString::fromUtf8(m_socket->readAll());
+
+        if (QFile::exists(configPath)) {
+            if (!QDesktopServices::openUrl(QUrl::fromLocalFile(configPath))) {
+                QMessageBox::warning(this, "Ошибка",
+                    QString("Не удалось открыть файл:\n%1").arg(configPath));
+            }
+        }
+        else {
+            QMessageBox::warning(this, "Ошибка",
+                QString("Конфигурационный файл не найден:\n%1").arg(configPath));
+        }
+    }
+    else {
+        QMessageBox::warning(this, "Ошибка",
+            "Не удалось получить путь к конфигурации от приложения");
+    }
 }
 
 void MainWindow::connectToApp()

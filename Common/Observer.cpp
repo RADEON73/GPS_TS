@@ -1,5 +1,6 @@
 #include "Observer.h"
 #include "Logger.h"
+#include "qdir.h"
 
 Observer::Observer(const QString& serverName, QObject* parent)
     : QObject(parent), m_serverName(serverName)
@@ -27,7 +28,21 @@ void Observer::onNewConnection()
     QLocalSocket* client = m_server.nextPendingConnection();
     m_clients.append(client);
 
+    connect(client, &QLocalSocket::readyRead, this, &Observer::onClientReadyRead);
     connect(client, &QLocalSocket::disconnected, this, &Observer::onClientDisconnected);
+}
+
+void Observer::onClientReadyRead() const
+{
+    QLocalSocket* client = qobject_cast<QLocalSocket*>(sender());
+    if (!client) return;
+
+    QString request = QString::fromUtf8(client->readAll()).trimmed();
+    if (request == "GET_CONFIG_PATH") {
+        QString configPath = QDir(QCoreApplication::applicationDirPath()).filePath("settings.ini");
+        client->write(configPath.toUtf8());
+        client->flush();
+    }
 }
 
 void Observer::onClientDisconnected()

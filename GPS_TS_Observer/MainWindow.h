@@ -19,6 +19,8 @@ public:
 private slots:
     void on_connectBtn_clicked();
     void on_openConfigBtn_clicked();
+    void on_actionExit_triggered();
+    void on_actionAbout_triggered();
     void readData();
     void handleError(QLocalSocket::LocalSocketError socketError);
     void handleDisconnected();

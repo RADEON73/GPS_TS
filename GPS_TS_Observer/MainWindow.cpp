@@ -40,6 +40,17 @@ void MainWindow::on_openConfigBtn_clicked()
     requestConfigPath();
 }
 
+void MainWindow::on_actionExit_triggered()
+{
+	QApplication::quit();
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(this, "О программе GPS_TS_Observer",
+        "Версия 1.0.0\nПрограмма предназначенa для мониторинга сервисов GPS_TS_Server и GPS_TS_Client работающих в виде службы. И изменения их параметров.");
+}
+
 // Метод для запроса пути к конфигу
 void MainWindow::requestConfigPath()
 {
@@ -87,6 +98,7 @@ void MainWindow::connectToApp()
 
     if (m_socket->waitForConnected(1000)) {
         ui.connectBtn->setText("Отключить");
+        ui.statusbar->showMessage("Статус соединения: Установлено");
         ui.appSelectorCb->setEnabled(false);
         appendMessage(timestamp + QString("Подключено к %1").arg(ui.appSelectorCb->currentText()));
     }
@@ -94,6 +106,7 @@ void MainWindow::connectToApp()
         appendMessage(timestamp + QString("Ошибка подключения к %1: %2")
             .arg(ui.appSelectorCb->currentText())
             .arg(m_socket->errorString()));
+        ui.statusbar->showMessage("Статус соединения: Не удалось установить соединение", 5000);
     }
 }
 
@@ -134,6 +147,7 @@ void MainWindow::handleDisconnected()
 
     appendMessage(timestamp + QString("Отключено от %1").arg(ui.appSelectorCb->currentText()));
     ui.connectBtn->setText("Подключить");
+    ui.statusbar->showMessage("Статус соединения: Разорвано");
     ui.appSelectorCb->setEnabled(true);
 }
 

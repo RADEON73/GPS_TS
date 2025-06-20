@@ -27,7 +27,7 @@ signals:
     void portError(const QString& errorString);
     void dataTimeout();
     void dataRestored();
-    void setTime(const QString& UTSDate, const QString& UTSTime);
+    void setTime(const DateTimePacket& timeData);
 
 private slots:
     void handleReadyRead();

@@ -1,7 +1,6 @@
 #include "Logger.h"
 #include "TimeSynchronizer.h"
 #include <qsystemdetection.h>
-#include <qdatastream.h>
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
@@ -36,18 +35,12 @@ TimeSynchronizer::TimeSynchronizer(QObject* parent) : QObject(parent)
 
 QByteArray TimeSynchronizer::timeToBinary() const
 {
-	QByteArray data;
-	QDataStream stream(&data, QIODevice::WriteOnly);
-	stream << m_timeVariable.toMSecsSinceEpoch(); // UNIX timestamp в миллисекундах
-	return data;
+	return m_timeVariable.toBinary();
 }
 
 void TimeSynchronizer::timeFromBinary(const QByteArray& timeData)
 {
-	QDataStream stream(timeData);
-	qint64 msecs;
-	stream >> msecs;
-	m_timeVariable = QDateTime::fromMSecsSinceEpoch(msecs, Qt::UTC);
+	m_timeVariable.fromBinary(timeData);
 }
 
 void TimeSynchronizer::synchronizeTime() const
@@ -69,36 +62,28 @@ void TimeSynchronizer::synchronizeTime() const
 		return;
 	}
 #endif // _DEBUG
-	if (!SetLocalTime(&newTime))
-		Logger::instance().warning("Ошибка при попытке установки системного времени");
+	if (m_timeVariable.isValid) {
+		if (!SetLocalTime(&newTime))
+			Logger::instance().warning("Ошибка при попытке установки системного времени");
+		else
+			Logger::instance().info("Время было успешно установлено " + systemTimeToString(newTime));
+	}
 	else
-		Logger::instance().info("Время было успешно установлено " + systemTimeToString(newTime));
+		Logger::instance().warning("Данные времени не валидны. Невозможно установить системное время.");
+
 #endif
 }
 
-void TimeSynchronizer::setTime(const QString& UTSDate, const QString& UTSTime)
+void TimeSynchronizer::setTime(const DateTimePacket& timeData)
 {
-	// Формат даты: DDMMYY
-	// Формат времени: HHMMSS.SSS
-	QDate date( // "270812"
-		2000 + UTSDate.mid(4, 2).toInt(), // Год
-		UTSDate.mid(2, 2).toInt(), // Месяц
-		UTSDate.left(2).toInt() // День
-	);
-	QTime time( // "183015.000"
-		UTSTime.left(2).toInt(), // Часы
-		UTSTime.mid(2, 2).toInt(), // Минуты
-		UTSTime.mid(4, 2).toInt(), // Секунды
-		UTSTime.mid(7, 3).toInt() // Миллисекунды
-	);
-	m_timeVariable = QDateTime(date, time, Qt::UTC);
+	m_timeVariable = timeData;
 }
 
 #ifdef Q_OS_WIN
 SYSTEMTIME TimeSynchronizer::time() const
 {
-	SYSTEMTIME st;
-	QDateTime localDt = m_timeVariable.toLocalTime(); //С учетом часового пояса
+	SYSTEMTIME st{};
+	QDateTime localDt = m_timeVariable.dateTime.toLocalTime(); //С учетом часового пояса
 	//QDateTime localDt = dt; //Без учета часового пояса
 	st.wYear = static_cast<WORD>(localDt.date().year());
 	st.wMonth = static_cast<WORD>(localDt.date().month());

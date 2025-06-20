@@ -60,9 +60,8 @@ void SerialPort::handleReadyRead()
             if (m_localBuf[0] == '$') {
                 if (auto nmeaParser = NmeaParserFactory::createParser(m_localBuf)) {
                     auto data = nmeaParser->parse(m_localBuf.split(','));
-                    if (auto rmcData = std::get_if<RMC_Data>(&data)) {
-                        emit setTime(rmcData->Date, rmcData->UTC_Time);
-                    }
+                    if (auto rmcData = std::get_if<RMC_Data>(&data))
+                        emit setTime(DateTimePacket(rmcData->Date, rmcData->UTC_Time, rmcData->Status));
                 }
 
             }
